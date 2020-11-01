@@ -1,0 +1,134 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Vocabulary</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.0/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <style>
+        .margin {
+            margin: 35px; /* Убираем отступы */
+        }
+    </style>
+
+    <div class="margin">
+        <h2>Vocabulary</h2>
+        <form name="wordForm" class="form-horizontal">
+            <div class="form-group">
+                <input type="hidden" name="id" value="0" />
+
+                <div class="col-md-5">
+                    <span asp-validation-for="EnglWord">English</span>
+                    <input asp-for="EnglWord" class="form-control" name="englWord" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="RussWord"></label>
+                <div class="col-md-5">
+                    <span asp-validation-for="RussWord">Russian</span>
+                    <input for="RussWord" class="form-control" name="russWord" />
+                </div>
+            </div>
+
+            <button type="submit" id="submit" class="btn btn-primary">Add Item</button>
+            <button type="submit" id="Translate" class="btn btn-primary">Translate</button>
+            <!--<button type="submit" id="reset" class="btn btn-primary">Reset</button>-->
+        </form>
+       
+    </div>
+    <script>
+
+        async function GetWords() {
+            const response = await fetch("/api/Word/", {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok === true) {
+                const words = await response.json();
+                let rows = document.querySelector("tbody");
+                words.forEach(word => {
+                    rows.append(row(word));
+                });
+            }
+        }
+
+        async function GetWord(newWord) {
+            const response = await fetch("/api/Word/" + newWord, {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            }); 
+            if (response.ok === true) {
+                
+                const word = await response.json();
+                const form = document.forms["wordForm"];
+                form.elements["id"].value = word.id;
+                form.elements["russWord"].value = word.russWord;
+                form.elements["englWord"].value = word.englWord;
+            }
+        }
+
+        
+        async function CreateWord(Engl, Russ) {
+            alert("hicreate");
+            const response = await fetch("api/Word", {
+                method: "POST",
+                headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    EnglWord: Engl,
+                    RussWord: Russ,
+                    AddRuss: null
+                })
+            });
+            if (response.ok === true) {
+                const word = await response.json();
+                reset();
+                document.querySelector("tbody").append(row(word));
+             }
+             reset();
+        }
+
+
+        document.forms["wordForm"].addEventListener("submit", e => {
+            e.preventDefault();
+            const form = document.forms["wordForm"];
+            const id = form.elements["id"].value;
+            const Russ = form.elements["russWord"].value;
+            const Engl = form.elements["englWord"].value;
+
+            if (Russ != "" && Engl != "") {
+                CreateWord(Engl, Russ);
+            }
+            else {
+                if (Russ != "")
+                {
+                    GetWord(Russ);
+                }
+                else
+                {
+                    if (Engl != "")
+                    {
+                        GetWord(Engl);
+                    }
+                }
+            }
+            
+        });
+
+        function reset() {
+            const form = document.forms["wordForm"];
+            form.reset();
+            form.elements["id"].value = 0;
+        }
+
+        //document.addEventListener("submit", e => {
+        //    alert("hi");
+        //    if (e.target.id.contains('reset')) {
+        //        reset();
+        //    }
+        //})
+    </script>
+</body>
+</html>
+
