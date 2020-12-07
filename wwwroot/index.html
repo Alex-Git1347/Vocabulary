@@ -40,20 +40,8 @@
 
     </div>
 
-    <div id="my">hi people</div>
     <script>
-
-        var a = 1; var b = 2;
-        var f =  new Function('a', 'b', 'return a+b')
-        var div = document.getElementById("my");
-        div.onclick = function () { alert(1) };
-        div.onclick = function () { alert(f) };
         
-        var a = [];
-        a[1] = 5;
-        a[5] = 55;
-
-        alert(a.length);
 
         async function GetWords() {
             const response = await fetch("/api/Word/", {
@@ -70,9 +58,6 @@
         }
 
         async function GetWord(newWord) {
-            alert("hicreate" + "12345");
-            div.onclick = function () { alert(1) };
-            div.onclick = function () { alert(2) };
             const response = await fetch("/api/Word/" + newWord, {
                 method: "GET",
                 headers: { "Accept": "application/json" }
@@ -89,7 +74,7 @@
 
         
         async function CreateWord(Engl, Russ) {
-            alert("hicreate" + "12345");
+            //alert("hicreate" + "12345");
             const response = await fetch("api/Word", {
                 method: "POST",
                 headers: { "Accept": "application/json", "Content-Type": "application/json" },
@@ -106,7 +91,7 @@
             }
             else {
 
-                alert("error my");
+                //alert("error my");
                 const errorData = await response.json();
                 console.log("errors", errorData);
                 if (errorData) {
@@ -147,7 +132,7 @@
             const Engl = form.elements["englWord"].value;
 
             if (Russ != "" && Engl != "") {
-                alert("hi");
+                //alert("hi");
                 CreateWord(Engl, Russ);
             }
             else {
