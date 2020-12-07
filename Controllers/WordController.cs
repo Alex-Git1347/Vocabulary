@@ -59,12 +59,21 @@ namespace Vocabulary.Controllers
         [HttpPost]
         public async Task<ActionResult<Word>> Post(Word word)
         {
-            if (word == null)
+            if (word.EnglWord == "admin")
             {
-                return BadRequest();
+                ModelState.AddModelError("EnglWord", "Недопустимое имя пользователя - admin");
             }
-            db.Words.Add(word);
-            await db.SaveChangesAsync();
+
+            if (ModelState.IsValid)
+            {
+                if (word == null)
+                {
+                    return BadRequest();
+                }
+                db.Words.Add(word);
+                await db.SaveChangesAsync();
+            }
+            else { return BadRequest(ModelState); }
             return Ok(word);
         }
 

@@ -15,19 +15,20 @@
 
     <div class="margin">
         <h2>Vocabulary</h2>
+        <div id="errors" class="alert alert-danger" style="display:none;"></div>
         <form name="wordForm" class="form-horizontal">
             <div class="form-group">
                 <input type="hidden" name="id" value="0" />
 
                 <div class="col-md-5">
-                    <span asp-validation-for="EnglWord">English</span>
+                    <span asp-validation-for="EnglWord" class="text-danger">English</span>
                     <input asp-for="EnglWord" class="form-control" name="englWord" />
                 </div>
             </div>
             <div class="form-group">
                 <label for="RussWord"></label>
                 <div class="col-md-5">
-                    <span asp-validation-for="RussWord">Russian</span>
+                    <span asp-validation-for="RussWord" class="text-danger">Russian</span>
                     <input for="RussWord" class="form-control" name="russWord" />
                 </div>
             </div>
@@ -36,9 +37,23 @@
             <button type="submit" id="Translate" class="btn btn-primary">Translate</button>
             <!--<button type="submit" id="reset" class="btn btn-primary">Reset</button>-->
         </form>
-       
+
     </div>
+
+    <div id="my">hi people</div>
     <script>
+
+        var a = 1; var b = 2;
+        var f =  new Function('a', 'b', 'return a+b')
+        var div = document.getElementById("my");
+        div.onclick = function () { alert(1) };
+        div.onclick = function () { alert(f) };
+        
+        var a = [];
+        a[1] = 5;
+        a[5] = 55;
+
+        alert(a.length);
 
         async function GetWords() {
             const response = await fetch("/api/Word/", {
@@ -55,6 +70,9 @@
         }
 
         async function GetWord(newWord) {
+            alert("hicreate" + "12345");
+            div.onclick = function () { alert(1) };
+            div.onclick = function () { alert(2) };
             const response = await fetch("/api/Word/" + newWord, {
                 method: "GET",
                 headers: { "Accept": "application/json" }
@@ -71,7 +89,7 @@
 
         
         async function CreateWord(Engl, Russ) {
-            alert("hicreate");
+            alert("hicreate" + "12345");
             const response = await fetch("api/Word", {
                 method: "POST",
                 headers: { "Accept": "application/json", "Content-Type": "application/json" },
@@ -85,19 +103,51 @@
                 const word = await response.json();
                 reset();
                 document.querySelector("tbody").append(row(word));
-             }
-             reset();
+            }
+            else {
+
+                alert("error my");
+                const errorData = await response.json();
+                console.log("errors", errorData);
+                if (errorData) {
+                    // ошибки вследствие валидации по атрибутам
+                    if (errorData.errors) {
+                        if (errorData.errors["RussWord"]) {
+                            addError(errorData.errors["RussWord"]);
+                        }
+                        if (errorData.errors["EnglWord"]) {
+                            addError(errorData.errors["EnglWord"]);
+                        }
+                    }
+                    // кастомные ошибки, определенные в контроллере
+                    // добавляем ошибки свойства Name
+                    if (errorData["RussWord"]) {
+                        addError(errorData["RussWord"]);
+                    }
+
+                    // добавляем ошибки свойства Age
+                    if (errorData["EnglWord"]) {
+                        addError(errorData["EnglWord"]);
+                    }
+                }
+
+                document.getElementById("errors").style.display = "block";
+            }
         }
+        
 
 
         document.forms["wordForm"].addEventListener("submit", e => {
             e.preventDefault();
+            document.getElementById("errors").innerHTML = "";
+            document.getElementById("errors").style.display = "none";
             const form = document.forms["wordForm"];
             const id = form.elements["id"].value;
             const Russ = form.elements["russWord"].value;
             const Engl = form.elements["englWord"].value;
 
             if (Russ != "" && Engl != "") {
+                alert("hi");
                 CreateWord(Engl, Russ);
             }
             else {
